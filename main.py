@@ -10,6 +10,8 @@ folders_and_files_dict = {  # 'folder_path' :
     # 'sub_files': a list of subfiles of the current folder}
 }
 
+folder_size_dict = {}
+
 
 def remove_escape_characters(path):
     return path.replace("\\", "/")
@@ -23,7 +25,7 @@ def get_size(start_path):  # returns the total size in bytes of all the subfolde
             # skip if it is symbolic link
             if not os.path.islink(fp):
                 total_size += os.path.getsize(fp)
-
+        folder_size_dict[dir_path] = total_size
     return total_size
 
 
@@ -81,7 +83,6 @@ def DFS_folder_search(level, dir_path):
 
 def generate_info_dict(options, ext_list, dir_path):
     info_dir_dict = {}
-
     if '0' in options:
         non_recursive_search(dir_path)  # for recursive search in folder
         DFS_folder_search(0, dir_path)
@@ -92,7 +93,10 @@ def generate_info_dict(options, ext_list, dir_path):
         info_dict = {'parent': folders_and_files_dict[folder]['parent'],
                      'level': folders_and_files_dict[folder]['level']}
         if '1' in options:  # total size of the folder
-            info_dict['total_size'] = str(get_size(folder)) + ' bytes'
+            if folder in folder_size_dict.keys():
+                info_dict['total_size'] = str(folder_size_dict[folder]) + ' bytes'
+            else:
+                info_dict['total_size'] = str(get_size(folder)) + ' bytes'
         if '2' in options:  # number of files
             info_dict['nr_of_files'] = len(folders_and_files_dict[folder]['sub_files'])
         if '3' in options:  # number of files with extension
